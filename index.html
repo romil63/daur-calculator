@@ -7,7 +7,19 @@
     <title>Daur Calculator</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body class="locked">
+    <section id="pin-screen" class="pin-screen" aria-labelledby="pin-title">
+      <form id="pin-form" class="pin-card">
+        <p class="eyebrow">Private Calculator</p>
+        <h1 id="pin-title">Enter PIN</h1>
+        <p class="intro">Enter the PIN and today's 14KT gold rate to open Daur Calculator.</p>
+        <label>PIN<input id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="4" required autofocus /></label>
+        <label>Gold Rate / g (14KT)<input id="login-gold-rate" inputmode="decimal" value="9370" required /></label>
+        <p class="fixed-note">Diamond rate is fixed at ₹35,000 / ct.</p>
+        <button type="submit">Open Calculator</button>
+        <p id="pin-message" class="message" role="alert"></p>
+      </form>
+    </section>
     <main class="calculator">
       <header>
         <p class="eyebrow">14KT Jewellery Pricing</p>

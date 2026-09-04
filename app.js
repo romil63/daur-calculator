@@ -3,6 +3,7 @@ const CERTIFICATE_CHARGE = 1500;
 const MAKING_CHARGE_RATE = 0.18;
 const GST_RATE = 0.03;
 const rates = { goldRate: 9370, diamondRate: 35000 };
+const PIN_HASH = "5f0e92362198dc68190b3e7ba044e6475ae036de70be6536a056de57290d3a03";
 
 const input = (id) => document.getElementById(id);
 const money = new Intl.NumberFormat("en-IN", {
@@ -60,18 +61,31 @@ input("reset-button").addEventListener("click", () => {
   input("message").textContent = "";
 });
 
-function askForGoldRate() {
-  const enteredRate = window.prompt("Enter today's 14KT gold rate per gram.", rates.goldRate);
-  if (enteredRate === null || !enteredRate.trim()) return;
-
-  const goldRate = Number(enteredRate.replaceAll(",", ""));
-  if (!Number.isFinite(goldRate) || goldRate < 0) {
-    input("message").textContent = "Invalid gold rate. Using the default rate of ₹9,370.";
-    return;
-  }
-
-  rates.goldRate = goldRate;
-  input("gold-rate").value = rates.goldRate;
+async function hashPin(pin) {
+  const bytes = new TextEncoder().encode(pin);
+  const hash = await crypto.subtle.digest("SHA-256", bytes);
+  return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-askForGoldRate();
+function unlockCalculator(goldRate) {
+  rates.goldRate = goldRate;
+  input("gold-rate").value = rates.goldRate;
+  document.body.classList.remove("locked");
+}
+
+input("pin-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const pin = input("pin-input").value;
+  const goldRate = Number(input("login-gold-rate").value.trim().replaceAll(",", ""));
+  if (!Number.isFinite(goldRate) || goldRate < 0) {
+    input("pin-message").textContent = "Enter a valid gold rate.";
+    return;
+  }
+  if (await hashPin(pin) === PIN_HASH) {
+    unlockCalculator(goldRate);
+    return;
+  }
+  input("pin-message").textContent = "Incorrect PIN. Please try again.";
+  input("pin-input").value = "";
+  input("pin-input").focus();
+});
