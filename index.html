@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#8a5b2b" />
+    <title>Daur Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="calculator">
+      <header>
+        <p class="eyebrow">14KT Jewellery Pricing</p>
+        <h1>Daur Calculator</h1>
+        <p class="intro">Calculate gold, diamond, making charges and GST in one place.</p>
+      </header>
+
+      <form id="calculator-form">
+        <section class="card" aria-labelledby="weights-title">
+          <h2 id="weights-title">Weights</h2>
+          <label>Gold Gross Weight (g)<input id="gross-weight" inputmode="decimal" placeholder="e.g. 3.070" /></label>
+          <label>Gold Net Weight (g)<input id="net-weight" inputmode="decimal" placeholder="e.g. 2.801" /></label>
+          <label>Diamond Weight (cts)<input id="diamond-weight" inputmode="decimal" placeholder="e.g. 1.344" /></label>
+        </section>
+
+        <section class="card" aria-labelledby="rates-title">
+          <h2 id="rates-title">Rates</h2>
+          <label>Gold Rate / g (14KT)<input id="gold-rate" value="9370" readonly /></label>
+          <label>Diamond Rate / ct<input id="diamond-rate" value="35000" readonly /></label>
+          <p class="fixed-note">Gold rate is set when the calculator opens. Diamond rate is fixed.</p>
+          <p class="fixed-note">Making charges: 18% of gold value</p>
+        </section>
+
+        <div class="actions">
+          <button type="submit">Calculate</button>
+          <button type="button" id="reset-button" class="secondary">Reset</button>
+        </div>
+      </form>
+
+      <section class="card breakdown" aria-labelledby="breakdown-title">
+        <h2 id="breakdown-title">Price Breakdown</h2>
+        <div class="row"><span>Gold Value</span><strong id="gold-value">₹0.00</strong></div>
+        <div class="row"><span>Making Charges (18%)</span><strong id="making-charges">₹0.00</strong></div>
+        <div class="row"><span>Diamond Value</span><strong id="diamond-value">₹0.00</strong></div>
+        <div class="row"><span>Rhodium Charge</span><strong>₹1,200.00</strong></div>
+        <div class="row"><span>Certificate Charge</span><strong>₹1,500.00</strong></div>
+        <div class="row divider"><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div>
+        <div class="row"><span>GST (3%)</span><strong id="gst-value">₹0.00</strong></div>
+        <div class="row total"><span>Final Total</span><strong id="final-total">₹0.00</strong></div>
+      </section>
+      <p id="message" class="message" role="alert"></p>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
