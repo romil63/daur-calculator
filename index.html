@@ -43,6 +43,11 @@
           <label>Person Name<input id="person-name" type="text" placeholder="e.g. Priya Shah" autocomplete="name" /></label>
           <label>Gold Net Weight (g)<input id="net-weight" inputmode="decimal" placeholder="e.g. 2.801" /></label>
           <label>Diamond Weight (cts)<input id="diamond-weight" inputmode="decimal" placeholder="e.g. 1.344" /></label>
+          <fieldset class="purity-choice">
+            <legend>Gold Purity</legend>
+            <label><input type="radio" name="gold-purity" value="14" checked /> 14KT</label>
+            <label><input type="radio" name="gold-purity" value="18" /> 18KT</label>
+          </fieldset>
         </section>
 
         <div class="actions">
@@ -54,7 +59,7 @@
 
       <section class="card breakdown" aria-labelledby="breakdown-title">
         <h2 id="breakdown-title">Price Breakdown</h2>
-        <div class="row"><span>Gold Value</span><strong id="gold-value">₹0.00</strong></div>
+        <div class="row"><span id="gold-value-label">Gold Value (14KT)</span><strong id="gold-value">₹0.00</strong></div>
         <div class="row"><span>Making Charges (18%)</span><strong id="making-charges">₹0.00</strong></div>
         <div class="row"><span>Diamond Value</span><strong id="diamond-value">₹0.00</strong></div>
         <div class="row"><span>Rhodium Charge</span><strong>₹1,200.00</strong></div>

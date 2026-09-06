@@ -29,15 +29,18 @@ function setValue(id, value) {
 function calculate() {
   const netWeight = numberFrom("net-weight");
   const diamondWeight = numberFrom("diamond-weight");
-  const goldValue = netWeight * rates.goldRate14;
+  const purity = document.querySelector('input[name="gold-purity"]:checked').value;
+  const goldRate = purity === "18" ? rates.goldRate18 : rates.goldRate14;
+  const goldValue = netWeight * goldRate;
   const makingCharges = goldValue * MAKING_CHARGE_RATE;
   const diamondValue = diamondWeight * rates.diamondRate;
   const subtotal = goldValue + makingCharges + diamondValue + RHODIUM_CHARGE + CERTIFICATE_CHARGE;
   const gstValue = subtotal * GST_RATE;
-  return { netWeight, diamondWeight, goldValue, makingCharges, diamondValue, subtotal, gstValue, finalTotal: subtotal + gstValue };
+  return { purity: `${purity}KT`, netWeight, diamondWeight, goldValue, makingCharges, diamondValue, subtotal, gstValue, finalTotal: subtotal + gstValue };
 }
 
 function displayCalculation(calculation) {
+  input("gold-value-label").textContent = `Gold Value (${calculation.purity})`;
   setValue("gold-value", calculation.goldValue);
   setValue("making-charges", calculation.makingCharges);
   setValue("diamond-value", calculation.diamondValue);
@@ -65,6 +68,7 @@ input("reset-button").addEventListener("click", () => {
   input("gold-rate-18").value = rates.goldRate18.toFixed(2);
   input("diamond-rate").value = rates.diamondRate;
   ["gold-value", "making-charges", "diamond-value", "subtotal", "gst-value", "final-total"].forEach((id) => setValue(id, 0));
+  input("gold-value-label").textContent = "Gold Value (14KT)";
   input("message").textContent = "";
   currentCalculation = null;
 });
@@ -79,7 +83,7 @@ function renderEstimateList() {
   }
   list.innerHTML = estimates.map((estimate, index) => `
     <article class="estimate-item">
-      <div><h3>${escapeHtml(estimate.name)}</h3><p>${estimate.netWeight}g gold · ${estimate.diamondWeight} ct diamond</p></div>
+      <div><h3>${escapeHtml(estimate.name)}</h3><p>${estimate.purity} gold · ${estimate.netWeight}g · ${estimate.diamondWeight} ct diamond</p></div>
       <div class="estimate-item-total"><span>Subtotal: ${money.format(estimate.subtotal)}</span><strong>${money.format(estimate.finalTotal)}</strong><button type="button" class="remove-estimate" data-index="${index}" aria-label="Remove ${escapeHtml(estimate.name)}">Remove</button></div>
     </article>`).join("");
 }
@@ -151,7 +155,7 @@ function downloadEstimatePng() {
     ctx.fillText(`${index + 1}. ${estimate.name}`, 52, y + 8);
     ctx.font = "20px Arial";
     ctx.fillStyle = "#736459";
-    ctx.fillText(`Subtotal: ${money.format(estimate.subtotal)}`, 52, y + 42);
+    ctx.fillText(`${estimate.purity} gold · Subtotal: ${money.format(estimate.subtotal)}`, 52, y + 42);
     ctx.textAlign = "right";
     ctx.fillStyle = "#16713a";
     ctx.font = "bold 24px Arial";

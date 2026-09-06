@@ -15,11 +15,11 @@ Then open http://127.0.0.1:8081 in a browser.
 ## Formula Used
 
 - Enter the 24KT gold rate at sign-in. The calculator derives `14KT = 24KT × 0.60` and `18KT = 24KT × 0.76`.
-- `gold value = net wt * 14KT gold rate`
+- Choose 14KT or 18KT before calculating. `gold value = net wt × selected gold rate`.
 - `making charges = gold value * 18%`
 - `diamond value = diamond wt * diamond rate`
 - `subtotal = gold value + making charges + diamond value + 1200 rhodium charge + 1500 certificate charge`
 - `gst = subtotal * 3%`
 - `final total = subtotal + gst`
 
-Add an estimate under a person's name to collect product subtotals and a combined final total. The list can be downloaded as a PNG with the creation date and time.
+Add an estimate under a person's name to collect product subtotals and a combined final total. Each saved product shows its selected 14KT or 18KT gold purity and diamond carat weight. The list can be downloaded as a PNG with the creation date and time.
