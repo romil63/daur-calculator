@@ -37,7 +37,7 @@ input { width: 100%; padding: 13px; border: 1px solid #bba68d; border-radius: 9p
 input:focus { outline: 3px solid #d8b46b88; border-color: var(--gold); }
 input[readonly] { background: #f0e9dd; color: #6c5a4b; cursor: not-allowed; }
 .fixed-note { margin: 19px 0 0; color: var(--muted); font: italic 0.92rem/1.3 Arial, sans-serif; }
-.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 button { min-height: 50px; border: 0; border-radius: 10px; background: var(--gold); color: #fff; font: 700 1rem Arial, sans-serif; }
 button:active { transform: translateY(1px); background: var(--gold-dark); }
 button.secondary { background: #ded3c5; color: var(--ink); }
@@ -46,11 +46,33 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .row strong { text-align: right; white-space: nowrap; }
 .divider { margin-top: 4px; border-top: 1px solid var(--line); padding-top: 16px; }
 .total { margin: 8px -4px -4px; padding: 15px 12px; border-radius: 9px; background: #e7f7d9; color: var(--green); font-size: 1.2rem; }
+.add-estimate { width: 100%; margin-top: 16px; background: var(--green); }
 .message { min-height: 1.3em; color: #a1261d; font: 0.9rem/1.3 Arial, sans-serif; }
 .admin-page { width: min(100%, 460px); }
 .success { color: var(--green); }
+.estimate-dialog { width: min(94vw, 720px); max-height: min(90vh, 760px); padding: 0; border: 0; border-radius: 16px; background: transparent; }
+.estimate-dialog::backdrop { background: #2d241d88; }
+.estimate-card { padding: 24px; background: var(--card); }
+.dialog-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.dialog-heading h2 { margin-bottom: 0; }
+.close-button { width: 42px; min-height: 42px; padding: 0; background: #ded3c5; color: var(--ink); font-size: 1.8rem; line-height: 1; }
+.estimate-list { margin: 22px 0; }
+.empty-list { color: var(--muted); font: 1rem/1.4 Arial, sans-serif; }
+.estimate-item { display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-top: 1px solid var(--line); font-family: Arial, sans-serif; }
+.estimate-item h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.estimate-item p, .estimate-item-total span { margin: 0; color: var(--muted); font-size: .9rem; }
+.estimate-item-total { display: grid; justify-items: end; gap: 6px; text-align: right; }
+.estimate-item-total strong { color: var(--green); font-size: 1.1rem; }
+.remove-estimate { min-height: 30px; padding: 3px 8px; background: transparent; color: #a1261d; border: 1px solid #d7aaa5; border-radius: 6px; font-size: .78rem; }
+.estimate-grand-total { display: flex; justify-content: space-between; gap: 18px; padding: 16px 12px; border-radius: 9px; background: #e7f7d9; color: var(--green); font: 700 1.2rem Arial, sans-serif; }
+.download-button { width: 100%; margin-top: 16px; }
 
 @media (min-width: 640px) {
-  #calculator-form { grid-template-columns: 1fr 1fr; }
-  .actions { grid-column: 1 / -1; width: 50%; }
+  .actions { width: min(100%, 520px); }
+}
+
+@media (max-width: 500px) {
+  .actions { grid-template-columns: 1fr; }
+  .estimate-item { display: block; }
+  .estimate-item-total { justify-items: start; text-align: left; margin-top: 12px; }
 }

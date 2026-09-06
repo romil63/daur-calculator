@@ -12,9 +12,9 @@
       <form id="pin-form" class="pin-card">
         <p class="eyebrow">Private Calculator</p>
         <h1 id="pin-title">Enter PIN</h1>
-        <p class="intro">Enter the PIN and today's 14KT gold rate to open Daur Calculator.</p>
+        <p class="intro">Enter the PIN and today's 24KT gold rate to open Daur Calculator.</p>
         <label>PIN<input id="pin-input" type="password" inputmode="numeric" autocomplete="off" maxlength="4" required autofocus /></label>
-        <label>Gold Rate / g (14KT)<input id="login-gold-rate" inputmode="decimal" value="9370" required /></label>
+        <label>Gold Rate / g (24KT)<input id="login-gold-rate" inputmode="decimal" value="9370" required /></label>
         <p class="fixed-note">Diamond rate is fixed at ₹35,000 / ct.</p>
         <button type="submit">Open Calculator</button>
         <p id="pin-message" class="message" role="alert"></p>
@@ -22,30 +22,33 @@
     </section>
     <main class="calculator">
       <header>
-        <p class="eyebrow">14KT Jewellery Pricing</p>
+        <p class="eyebrow">Jewellery Pricing</p>
         <h1>Daur Calculator</h1>
         <p class="intro">Calculate gold, diamond, making charges and GST in one place.</p>
       </header>
 
       <form id="calculator-form">
-        <section class="card" aria-labelledby="weights-title">
-          <h2 id="weights-title">Weights</h2>
-          <label>Gold Gross Weight (g)<input id="gross-weight" inputmode="decimal" placeholder="e.g. 3.070" /></label>
-          <label>Gold Net Weight (g)<input id="net-weight" inputmode="decimal" placeholder="e.g. 2.801" /></label>
-          <label>Diamond Weight (cts)<input id="diamond-weight" inputmode="decimal" placeholder="e.g. 1.344" /></label>
-        </section>
-
         <section class="card" aria-labelledby="rates-title">
           <h2 id="rates-title">Rates</h2>
-          <label>Gold Rate / g (14KT)<input id="gold-rate" value="9370" readonly /></label>
+          <label>Gold Rate / g (24KT)<input id="gold-rate-24" value="9370" readonly /></label>
+          <label>Gold Rate / g (14KT)<input id="gold-rate-14" value="5622" readonly /></label>
+          <label>Gold Rate / g (18KT)<input id="gold-rate-18" value="7121.20" readonly /></label>
           <label>Diamond Rate / ct<input id="diamond-rate" value="35000" readonly /></label>
-          <p class="fixed-note">Gold rate is set when the calculator opens. Diamond rate is fixed.</p>
+          <p class="fixed-note">14KT is 60% and 18KT is 76% of the 24KT rate. Diamond rate is fixed.</p>
           <p class="fixed-note">Making charges: 18% of gold value</p>
+        </section>
+
+        <section class="card" aria-labelledby="weights-title">
+          <h2 id="weights-title">Product Details</h2>
+          <label>Person Name<input id="person-name" type="text" placeholder="e.g. Priya Shah" autocomplete="name" /></label>
+          <label>Gold Net Weight (g)<input id="net-weight" inputmode="decimal" placeholder="e.g. 2.801" /></label>
+          <label>Diamond Weight (cts)<input id="diamond-weight" inputmode="decimal" placeholder="e.g. 1.344" /></label>
         </section>
 
         <div class="actions">
           <button type="submit">Calculate</button>
           <button type="button" id="reset-button" class="secondary">Reset</button>
+          <button type="button" id="open-estimate-button" class="secondary">Open Estimate List</button>
         </div>
       </form>
 
@@ -59,9 +62,21 @@
         <div class="row divider"><span>Subtotal</span><strong id="subtotal">₹0.00</strong></div>
         <div class="row"><span>GST (3%)</span><strong id="gst-value">₹0.00</strong></div>
         <div class="row total"><span>Final Total</span><strong id="final-total">₹0.00</strong></div>
+        <button type="button" id="add-estimate-button" class="add-estimate">Add to Estimate List</button>
       </section>
       <p id="message" class="message" role="alert"></p>
     </main>
+    <dialog id="estimate-dialog" class="estimate-dialog" aria-labelledby="estimate-title">
+      <section class="estimate-card">
+        <div class="dialog-heading">
+          <div><p class="eyebrow">Saved Products</p><h2 id="estimate-title">Estimate List</h2></div>
+          <button type="button" id="close-estimate-button" class="close-button" aria-label="Close estimate list">×</button>
+        </div>
+        <div id="estimate-list" class="estimate-list" aria-live="polite"></div>
+        <div class="estimate-grand-total"><span>Final Total</span><strong id="estimate-grand-total">₹0.00</strong></div>
+        <button type="button" id="download-estimate-button" class="download-button">Download PNG</button>
+      </section>
+    </dialog>
     <script src="app.js"></script>
   </body>
 </html>
