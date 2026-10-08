@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#8a5b2b" />
+  <title>Daur Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="calculator admin-page">
+    <header>
+      <p class="eyebrow">Daur Management</p>
+      <h1>Admin Panel</h1>
+      <p class="intro">Manage product records and shared calculator rates.</p>
+      <a class="admin-link" href="index.html">Open calculator</a>
+    </header>
+    <section id="admin-login-card" class="card">
+      <h2>Admin sign in</h2>
+      <form id="admin-login-form">
+        <label>Admin email<input id="admin-email" type="email" autocomplete="username" required /></label>
+        <label>Password<input id="admin-password" type="password" autocomplete="current-password" required /></label>
+        <button type="submit">Sign in</button>
+      </form>
+      <button type="button" id="forgot-password-button" class="secondary">Forgot password?</button>
+      <p id="login-message" class="message" role="alert"></p>
+    </section>
+    <section id="password-recovery-card" class="card" hidden>
+      <h2>Set a new password</h2>
+      <form id="password-recovery-form">
+        <label>New password<input id="new-admin-password" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button type="submit">Save new password</button>
+      </form>
+      <p id="recovery-message" class="message" role="status"></p>
+    </section>
+    <div id="admin-dashboard" hidden>
+      <div class="admin-toolbar"><h2>Admin controls</h2><button type="button" id="logout-button" class="secondary">Sign out</button></div>
+      <section class="card">
+        <h2>Rate Card</h2>
+        <p class="fixed-note">Saved rates are shared with the calculator panel. Workbook imports do not change these values.</p>
+        <div class="admin-rate-grid">
+          <label>24KT Gold / g<input id="admin-gold24" inputmode="decimal" /></label>
+          <label>14KT multiplier (0.60 = 60%)<input id="admin-gold14-factor" inputmode="decimal" /></label>
+          <label>18KT multiplier (0.76 = 76%)<input id="admin-gold18-factor" inputmode="decimal" /></label>
+          <label>Diamond / ct<input id="admin-diamond" inputmode="decimal" /></label>
+          <label>Stone / ct<input id="admin-stone" inputmode="decimal" /></label>
+          <label>Making charge (%)<input id="admin-making" inputmode="decimal" /></label>
+          <label>GST (%)<input id="admin-gst" inputmode="decimal" /></label>
+          <label>Rhodium charge<input id="admin-rhodium" inputmode="decimal" /></label>
+          <label>Certificate charge<input id="admin-certificate" inputmode="decimal" /></label>
+        </div>
+        <button type="button" id="save-rates-button">Save rate card</button>
+        <p id="rates-message" class="message" role="status"></p>
+      </section>
+      <section class="card">
+        <h2>Product Database</h2>
+        <p class="fixed-note">When the workbook has stock rows with Model No, those one-piece model groups are imported. Otherwise, Packing List Extract is used. Scans use Model No / Product ID. Rates are unchanged.</p>
+        <label>Excel workbook<input id="product-file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" /></label>
+        <button type="button" id="import-products-button">Import or update products</button>
+        <p id="database-message" class="message" role="status"></p>
+      </section>
+      <section class="card">
+        <div class="admin-toolbar"><h2>Import batches</h2><button type="button" id="refresh-batches-button" class="secondary">Refresh</button></div>
+        <p class="fixed-note">Each workbook import is listed separately with its date and model IDs. Removing a batch removes its products unless another batch also contains them.</p>
+        <p id="inventory-message" class="message" role="status"></p>
+        <div id="import-batches-list" class="import-batches-list"></div>
+      </section>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="admin.js?v=batch-history-7"></script>
+</body>
+</html>

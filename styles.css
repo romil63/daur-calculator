@@ -42,6 +42,12 @@ input[readonly] { background: #f0e9dd; color: #6c5a4b; cursor: not-allowed; }
 .purity-choice input { width: 18px; height: 18px; padding: 0; accent-color: var(--gold); }
 .fixed-note { margin: 19px 0 0; color: var(--muted); font: italic 0.92rem/1.3 Arial, sans-serif; }
 .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.lookup-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.qr-video { display: block; width: min(100%, 420px); margin: 14px auto 0; border-radius: 12px; background: #211b16; }
+.qr-video[hidden] { display: none; }
+.admin-panel { margin-top: 14px; }
+.admin-panel summary { cursor: pointer; font: 700 1.15rem Arial, sans-serif; }
+.admin-rate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
 button { min-height: 50px; border: 0; border-radius: 10px; background: var(--gold); color: #fff; font: 700 1rem Arial, sans-serif; }
 button:active { transform: translateY(1px); background: var(--gold-dark); }
 button.secondary { background: #ded3c5; color: var(--ink); }
@@ -70,6 +76,16 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .remove-estimate { min-height: 30px; padding: 3px 8px; background: transparent; color: #a1261d; border: 1px solid #d7aaa5; border-radius: 6px; font-size: .78rem; }
 .estimate-grand-total { display: flex; justify-content: space-between; gap: 18px; padding: 16px 12px; border-radius: 9px; background: #e7f7d9; color: var(--green); font: 700 1.2rem Arial, sans-serif; }
 .download-button { width: 100%; margin-top: 16px; }
+.admin-link { display: inline-block; margin: 0 0 14px; color: var(--gold-dark); font: 700 .9rem Arial, sans-serif; }
+.admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 20px 0 12px; }
+.admin-toolbar h2 { margin: 0; }
+.admin-toolbar button { padding: 0 18px; }
+.import-batches-list { display: grid; gap: 12px; margin-top: 12px; }
+.import-batch { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fffdf9; }
+.import-batch-heading { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.import-batch-heading h3 { margin: 0; font: 700 1rem/1.3 Arial, sans-serif; }
+.import-batch-meta, .import-batch-models { margin: 8px 0 0; color: var(--muted); font: .86rem/1.4 Arial, sans-serif; overflow-wrap: anywhere; }
+.remove-batch-button { min-height: 36px; padding: 5px 11px; background: #9e362c; font-size: .82rem; white-space: nowrap; }
 
 @media (min-width: 640px) {
   .actions { width: min(100%, 520px); }
@@ -77,6 +93,7 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 
 @media (max-width: 500px) {
   .actions { grid-template-columns: 1fr; }
+  .admin-rate-grid { grid-template-columns: 1fr; }
   .estimate-item { display: block; }
   .estimate-item-total { justify-items: start; text-align: left; margin-top: 12px; }
 }
