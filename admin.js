@@ -123,81 +123,92 @@ async function loadBatches() {
   }
 }
 
+function renderSaleCard(sale, includeActions) {
+  const card = document.createElement("article");
+  card.className = "sale-card";
+  const info = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = `Model ${sale.model_number}`;
+  const badge = document.createElement("span");
+  badge.className = `sale-badge ${sale.status}`;
+  badge.textContent = sale.status === "approved" ? "Approved · Sold" : sale.status === "rejected" ? "Rejected" : "Awaiting approval";
+  const date = document.createElement("p");
+  date.className = "sale-meta";
+  date.textContent = new Date(sale.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+  info.append(title, badge, date);
+  const submittedDescription = document.createElement("p");
+  submittedDescription.className = "sale-description";
+  submittedDescription.textContent = `Salesperson: ${sale.description || "No description provided."}`;
+  info.append(submittedDescription);
+
+  if (includeActions) {
+    const actions = document.createElement("div");
+    actions.className = "sale-actions";
+    const adminDescription = document.createElement("textarea");
+    adminDescription.className = "admin-sale-description";
+    adminDescription.maxLength = 500;
+    adminDescription.rows = 2;
+    adminDescription.placeholder = "Add the admin description before approving";
+    adminDescription.value = sale.admin_description || "";
+    const approve = document.createElement("button");
+    approve.type = "button";
+    approve.textContent = "Save description & approve";
+    approve.addEventListener("click", () => reviewSale(sale, "approve_sale", adminDescription.value));
+    const reject = document.createElement("button");
+    reject.type = "button";
+    reject.className = "secondary";
+    reject.textContent = "Reject";
+    reject.addEventListener("click", () => reviewSale(sale, "reject_sale"));
+    actions.append(adminDescription, approve, reject);
+    card.append(info, actions);
+  } else {
+    if (sale.admin_description) {
+      const adminNote = document.createElement("p");
+      adminNote.className = "sale-description admin-note";
+      adminNote.textContent = `Admin: ${sale.admin_description}`;
+      info.append(adminNote);
+    }
+    card.append(info);
+  }
+  return card;
+}
+
 async function loadSales() {
   const message = byId("sales-message");
-  const container = byId("sales-list");
+  const pendingContainer = byId("sales-list");
+  const reviewedContainer = byId("reviewed-sales-list");
+  const reviewedMessage = byId("reviewed-sales-message");
   message.textContent = "Loading sales…";
-  container.replaceChildren();
+  reviewedMessage.textContent = "";
+  pendingContainer.replaceChildren();
+  reviewedContainer.replaceChildren();
   try {
     await requireAdmin();
-    const [inventory, approved, pending, recent] = await Promise.all([
+    const saleColumns = "id,model_number,status,description,admin_description,created_at";
+    const [inventory, approved, pending, rejected, pendingRows, reviewedRows] = await Promise.all([
       daurDb.from("products").select("model_number", { count: "exact", head: true }),
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "approved"),
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      daurDb.from("sales").select("id,model_number,status,description,admin_description,created_at").order("created_at", { ascending: false }).limit(100),
+      daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "rejected"),
+      daurDb.from("sales").select(saleColumns).eq("status", "pending").order("created_at", { ascending: false }).limit(200),
+      daurDb.from("sales").select(saleColumns).in("status", ["approved", "rejected"]).order("created_at", { ascending: false }).limit(100),
     ]);
-    for (const result of [inventory, approved, pending, recent]) if (result.error) throw result.error;
+    for (const result of [inventory, approved, pending, rejected, pendingRows, reviewedRows]) if (result.error) throw result.error;
 
     byId("available-pieces-count").textContent = String(Math.max((inventory.count ?? 0) - (approved.count ?? 0), 0));
     byId("approved-sales-count").textContent = String(approved.count ?? 0);
     byId("pending-sales-count").textContent = String(pending.count ?? 0);
-    if (!recent.data.length) {
-      message.textContent = "No sale requests yet.";
-      return;
-    }
+    byId("reviewed-sales-count").textContent = String((approved.count ?? 0) + (rejected.count ?? 0));
 
-    for (const sale of recent.data) {
-      const card = document.createElement("article");
-      card.className = "sale-card";
-      const info = document.createElement("div");
-      const title = document.createElement("h3");
-      title.textContent = `Model ${sale.model_number}`;
-      const badge = document.createElement("span");
-      badge.className = `sale-badge ${sale.status}`;
-      badge.textContent = sale.status === "approved" ? "Approved · Sold" : sale.status === "rejected" ? "Rejected" : "Awaiting approval";
-      const date = document.createElement("p");
-      date.className = "sale-meta";
-      date.textContent = new Date(sale.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-      info.append(title, badge, date);
-      const submittedDescription = document.createElement("p");
-      submittedDescription.className = "sale-description";
-      submittedDescription.textContent = `Salesperson: ${sale.description || "No description provided."}`;
-      info.append(submittedDescription);
+    for (const sale of pendingRows.data) pendingContainer.append(renderSaleCard(sale, true));
+    message.textContent = pendingRows.data.length
+      ? pendingRows.data.length === 200 ? "Showing the latest 200 pending requests." : `${pendingRows.data.length} sale request${pendingRows.data.length === 1 ? "" : "s"} awaiting approval.`
+      : "No pending sale requests.";
 
-      if (sale.status === "pending") {
-        const actions = document.createElement("div");
-        actions.className = "sale-actions";
-        const adminDescription = document.createElement("textarea");
-        adminDescription.className = "admin-sale-description";
-        adminDescription.maxLength = 500;
-        adminDescription.rows = 2;
-        adminDescription.placeholder = "Add the admin description before approving";
-        adminDescription.value = sale.admin_description || "";
-        const approve = document.createElement("button");
-        approve.type = "button";
-        approve.textContent = "Save description & approve";
-        approve.addEventListener("click", () => reviewSale(sale, "approve_sale", adminDescription.value));
-        const reject = document.createElement("button");
-        reject.type = "button";
-        reject.className = "secondary";
-        reject.textContent = "Reject";
-        reject.addEventListener("click", () => reviewSale(sale, "reject_sale"));
-        actions.append(adminDescription, approve, reject);
-        card.append(info, actions);
-      } else {
-        if (sale.admin_description) {
-          const adminNote = document.createElement("p");
-          adminNote.className = "sale-description admin-note";
-          adminNote.textContent = `Admin: ${sale.admin_description}`;
-          info.append(adminNote);
-        }
-        card.append(info);
-      }
-      container.append(card);
-    }
-    message.textContent = recent.data.length === 100
-      ? "Showing the latest 100 sale records."
-      : `${recent.data.length} sale record${recent.data.length === 1 ? "" : "s"} shown.`;
+    for (const sale of reviewedRows.data) reviewedContainer.append(renderSaleCard(sale, false));
+    reviewedMessage.textContent = !reviewedRows.data.length
+      ? "No approved or rejected records yet."
+      : reviewedRows.data.length === 100 ? "Showing the latest 100 reviewed records." : `${reviewedRows.data.length} reviewed record${reviewedRows.data.length === 1 ? "" : "s"}.`;
   } catch (error) {
     if (error.code === "42P01" || error.code === "PGRST205") {
       message.textContent = "Sale approvals need setup. Run supabase/sales_approval.sql once in Supabase SQL Editor, then refresh.";

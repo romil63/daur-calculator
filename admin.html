@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#8a5b2b" />
   <title>Daur Admin</title>
-  <link rel="stylesheet" href="styles.css?v=inventory-count-1" />
+  <link rel="stylesheet" href="styles.css?v=reviewed-sales-2" />
 </head>
 <body>
   <main class="calculator admin-page">
@@ -44,6 +44,11 @@
         </div>
         <p id="sales-message" class="message" role="status"></p>
         <div id="sales-list" class="sales-list"></div>
+        <details id="reviewed-sales" class="reviewed-sales">
+          <summary><span>Reviewed sales</span><span id="reviewed-sales-count" class="reviewed-sales-count">—</span></summary>
+          <p id="reviewed-sales-message" class="message" role="status"></p>
+          <div id="reviewed-sales-list" class="sales-list"></div>
+        </details>
       </section>
       <section class="card">
         <h2>Rate Card</h2>
@@ -81,6 +86,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
-  <script src="admin.js?v=inventory-count-1"></script>
+  <script src="admin.js?v=reviewed-sales-2"></script>
 </body>
 </html>

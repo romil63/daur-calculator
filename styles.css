@@ -89,6 +89,10 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .sales-metrics span, .sale-meta { color: var(--muted); font-size: .92rem; }
 .sales-metrics strong { color: var(--ink); font-size: 1.7rem; }
 .sales-list { display: grid; gap: 10px; margin-top: 12px; }
+.reviewed-sales { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.reviewed-sales summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--gold-dark); cursor: pointer; font: 700 .98rem Arial, sans-serif; }
+.reviewed-sales[open] summary { margin-bottom: 12px; }
+.reviewed-sales-count { min-width: 30px; padding: 4px 9px; border-radius: 999px; background: #f0e9dd; color: var(--ink); text-align: center; font-size: .85rem; }
 .sale-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
 .sale-card h3 { margin: 0; }
 .sale-meta { margin: 5px 0 0; }
