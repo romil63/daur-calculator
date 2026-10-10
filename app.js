@@ -4,6 +4,7 @@ let currentCalculation = null;
 let currentProductModel = "";
 let currentProductLabor = 0;
 let currentProductSaleStatus = "unavailable";
+let currentStaffRole = "";
 
 const input = (id) => document.getElementById(id);
 const money = new Intl.NumberFormat("en-IN", {
@@ -43,15 +44,73 @@ function showSaleControl(status) {
   const message = input("sale-request-message");
   currentProductSaleStatus = status;
   button.hidden = status === "unavailable" || status === "sold";
+  input("sale-description-field").hidden = button.hidden || status === "pending";
   input("sale-request-note").hidden = button.hidden;
-  button.disabled = status === "pending";
-  button.textContent = status === "pending" ? "Pending admin approval" : "Mark as sold";
+  button.disabled = status === "pending" || (status === "available" && !currentStaffRole);
+  button.textContent = status === "pending" ? "Pending admin approval" : currentStaffRole ? "Mark as sold" : "Sign in to mark as sold";
   message.textContent = status === "pending"
     ? "This model is waiting for admin approval."
     : status === "sold"
       ? "This model has already been approved as sold."
+      : status === "available" && !currentStaffRole
+        ? "Staff sign-in is required to submit a sale request."
       : "";
 }
+
+function setStaffRole(user) {
+  const role = user?.app_metadata?.daur_role;
+  currentStaffRole = role === "admin" || role === "salesman" ? role : "";
+  input("staff-login-form").hidden = Boolean(currentStaffRole);
+  input("staff-session").hidden = !currentStaffRole;
+  input("staff-session-label").textContent = currentStaffRole ? `${user.email} · ${currentStaffRole}` : "";
+  showSaleControl(currentProductSaleStatus);
+}
+
+async function restoreStaffSession() {
+  if (!window.daurSupabase) return;
+  const { data: { session }, error } = await window.daurSupabase.auth.getSession();
+  if (error) { input("staff-auth-message").textContent = error.message; return; }
+  if (!session) return;
+  const role = session.user?.app_metadata?.daur_role;
+  if (role !== "admin" && role !== "salesman") {
+    await window.daurSupabase.auth.signOut();
+    input("staff-auth-message").textContent = "This account is not enabled as Daur sales staff.";
+    return;
+  }
+  setStaffRole(session.user);
+}
+
+input("staff-login-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const message = input("staff-auth-message");
+  if (!window.daurSupabase) { message.textContent = "Supabase is not configured."; return; }
+  message.textContent = "Signing in…";
+  const { data, error } = await window.daurSupabase.auth.signInWithPassword({
+    email: input("staff-email").value.trim(),
+    password: input("staff-password").value,
+  });
+  if (error) { message.textContent = error.message; return; }
+  const role = data.user?.app_metadata?.daur_role;
+  if (role !== "admin" && role !== "salesman") {
+    await window.daurSupabase.auth.signOut();
+    setStaffRole(null);
+    message.textContent = "This account is not enabled as Daur sales staff.";
+    return;
+  }
+  input("staff-password").value = "";
+  message.textContent = "Staff sign-in successful.";
+  setStaffRole(data.user);
+});
+
+input("staff-signout-button").addEventListener("click", async () => {
+  if (!window.daurSupabase) return;
+  const { error } = await window.daurSupabase.auth.signOut();
+  if (error) { input("staff-auth-message").textContent = error.message; return; }
+  setStaffRole(null);
+  input("staff-auth-message").textContent = "Signed out.";
+});
+
+restoreStaffSession();
 
 async function loadRates() {
   try {
@@ -110,6 +169,7 @@ input("calculator-form").addEventListener("submit", async (event) => {
 
 input("reset-button").addEventListener("click", () => {
   input("calculator-form").reset();
+  input("sale-description").value = "";
   currentProductModel = "";
   currentProductLabor = 0;
   showSaleControl("unavailable");
@@ -185,6 +245,7 @@ async function lookupProduct() {
   if (!code) { input("lookup-message").textContent = "Scan the model ID or enter it manually."; return; }
   currentProductModel = "";
   currentProductLabor = 0;
+  input("sale-description").value = "";
   showSaleControl("unavailable");
   try {
     const { data, error } = await window.daurSupabase.rpc("lookup_product", { p_code: code });
@@ -215,19 +276,27 @@ input("product-code").addEventListener("keydown", (event) => { if (event.key ===
 input("product-code").addEventListener("input", () => {
   currentProductModel = "";
   currentProductLabor = 0;
+  input("sale-description").value = "";
   showSaleControl("unavailable");
 });
 
 input("request-sale-button").addEventListener("click", async () => {
   const button = input("request-sale-button");
   const message = input("sale-request-message");
-  if (!currentProductModel || currentProductSaleStatus !== "available") return;
+  if (!currentProductModel || currentProductSaleStatus !== "available" || !currentStaffRole) return;
   const modelNumber = currentProductModel;
+  const description = input("sale-description").value.trim();
+  if (!description) {
+    message.textContent = "Add a short sale description before marking this item as sold.";
+    input("sale-description").focus();
+    return;
+  }
   button.disabled = true;
   message.textContent = "Sending sale for admin approval…";
   try {
-    const { error } = await window.daurSupabase.rpc("submit_sale", { p_model_number: modelNumber });
+    const { error } = await window.daurSupabase.rpc("submit_sale", { p_model_number: modelNumber, p_description: description });
     if (error) throw error;
+    input("sale-description").value = "";
     showSaleControl("pending");
     input("lookup-message").textContent = `${modelNumber} submitted to admin for sale approval.`;
   } catch (error) {

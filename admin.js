@@ -133,7 +133,7 @@ async function loadSales() {
     const [approved, pending, recent] = await Promise.all([
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "approved"),
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "pending"),
-      daurDb.from("sales").select("id,model_number,status,created_at").order("created_at", { ascending: false }).limit(100),
+      daurDb.from("sales").select("id,model_number,status,description,admin_description,created_at").order("created_at", { ascending: false }).limit(100),
     ]);
     for (const result of [approved, pending, recent]) if (result.error) throw result.error;
 
@@ -157,22 +157,38 @@ async function loadSales() {
       date.className = "sale-meta";
       date.textContent = new Date(sale.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
       info.append(title, badge, date);
+      const submittedDescription = document.createElement("p");
+      submittedDescription.className = "sale-description";
+      submittedDescription.textContent = `Salesperson: ${sale.description || "No description provided."}`;
+      info.append(submittedDescription);
 
       if (sale.status === "pending") {
         const actions = document.createElement("div");
         actions.className = "sale-actions";
+        const adminDescription = document.createElement("textarea");
+        adminDescription.className = "admin-sale-description";
+        adminDescription.maxLength = 500;
+        adminDescription.rows = 2;
+        adminDescription.placeholder = "Add the admin description before approving";
+        adminDescription.value = sale.admin_description || "";
         const approve = document.createElement("button");
         approve.type = "button";
-        approve.textContent = "Approve sale";
-        approve.addEventListener("click", () => reviewSale(sale, "approve_sale"));
+        approve.textContent = "Save description & approve";
+        approve.addEventListener("click", () => reviewSale(sale, "approve_sale", adminDescription.value));
         const reject = document.createElement("button");
         reject.type = "button";
         reject.className = "secondary";
         reject.textContent = "Reject";
         reject.addEventListener("click", () => reviewSale(sale, "reject_sale"));
-        actions.append(approve, reject);
+        actions.append(adminDescription, approve, reject);
         card.append(info, actions);
       } else {
+        if (sale.admin_description) {
+          const adminNote = document.createElement("p");
+          adminNote.className = "sale-description admin-note";
+          adminNote.textContent = `Admin: ${sale.admin_description}`;
+          info.append(adminNote);
+        }
         card.append(info);
       }
       container.append(card);
@@ -181,16 +197,24 @@ async function loadSales() {
       ? "Showing the latest 100 sale records."
       : `${recent.data.length} sale record${recent.data.length === 1 ? "" : "s"} shown.`;
   } catch (error) {
-    message.textContent = error.code === "42P01" || error.code === "PGRST205"
-      ? "Sale approvals need setup. Run supabase/sales_approval.sql once in Supabase SQL Editor, then refresh."
-      : error.message;
+    if (error.code === "42P01" || error.code === "PGRST205") {
+      message.textContent = "Sale approvals need setup. Run supabase/sales_approval.sql once in Supabase SQL Editor, then refresh.";
+    } else if (error.code === "42703" || error.code === "PGRST204") {
+      message.textContent = "Sale descriptions need setup. Run supabase/salesperson_descriptions.sql in Supabase SQL Editor, then refresh.";
+    } else {
+      message.textContent = error.message;
+    }
   }
 }
 
-async function reviewSale(sale, action) {
+async function reviewSale(sale, action, adminDescription = "") {
   const approving = action === "approve_sale";
+  if (approving && !adminDescription.trim()) {
+    byId("sales-message").textContent = "Add an admin description before approving this sale.";
+    return;
+  }
   const prompt = approving
-    ? `Approve sale of model ${sale.model_number}? It will count as sold and stop future calculator lookups.`
+    ? `Save the admin description and approve sale of model ${sale.model_number}? It will count as sold and stop future calculator lookups.`
     : `Reject the sale request for model ${sale.model_number}? The product will remain available.`;
   if (!window.confirm(prompt)) return;
 
@@ -198,7 +222,9 @@ async function reviewSale(sale, action) {
   message.textContent = "Updating sale request…";
   try {
     await requireAdmin();
-    const { error } = await daurDb.rpc(action, { p_sale_id: sale.id });
+    const { error } = await daurDb.rpc(action, approving
+      ? { p_sale_id: sale.id, p_admin_description: adminDescription.trim() }
+      : { p_sale_id: sale.id });
     if (error) throw error;
     await loadSales();
   } catch (error) {

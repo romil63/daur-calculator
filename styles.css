@@ -10,6 +10,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -35,6 +36,8 @@ h2 { margin: 0 0 17px; font-size: 1.35rem; }
 label { display: grid; gap: 7px; margin-top: 14px; font: 600 0.97rem/1.2 Arial, sans-serif; }
 input { width: 100%; padding: 13px; border: 1px solid #bba68d; border-radius: 9px; background: #fffdf9; color: var(--ink); font: 1.15rem Arial, sans-serif; }
 input:focus { outline: 3px solid #d8b46b88; border-color: var(--gold); }
+textarea { width: 100%; min-height: 72px; padding: 11px; border: 1px solid #bba68d; border-radius: 9px; background: #fffdf9; color: var(--ink); font: 1rem/1.4 Arial, sans-serif; resize: vertical; }
+textarea:focus { outline: 3px solid #d8b46b88; border-color: var(--gold); }
 input[readonly] { background: #f0e9dd; color: #6c5a4b; cursor: not-allowed; }
 .purity-choice { display: flex; gap: 20px; align-items: center; margin: 20px 0 4px; padding: 13px; border: 1px solid var(--line); border-radius: 9px; font: 600 .97rem/1.2 Arial, sans-serif; }
 .purity-choice legend { padding: 0 5px; color: var(--muted); font-size: .86rem; }
@@ -90,6 +93,15 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .sale-card h3 { margin: 0; }
 .sale-meta { margin: 5px 0 0; }
 .sale-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-sale-description { flex: 1 0 100%; }
+.sale-description { max-width: 560px; margin: 9px 0 0; font: .92rem/1.4 Arial, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; }
+.admin-note { color: var(--green); }
+.staff-access { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.staff-access summary { color: var(--gold-dark); cursor: pointer; font: 700 .95rem Arial, sans-serif; }
+.staff-login-form { display: grid; gap: 4px; }
+.staff-login-form button { margin-top: 8px; }
+#staff-session { margin-top: 12px; font: .9rem/1.4 Arial, sans-serif; }
+#staff-signout-button { min-height: 36px; margin-left: 8px; padding: 4px 12px; font-size: .85rem; }
 .sale-badge { display: inline-block; margin-top: 7px; padding: 3px 9px; border-radius: 999px; background: #f4eadb; color: #6d4b28; font-size: .8rem; font-weight: 700; }
 .sale-badge.approved { background: #e4f4df; color: #285a32; }
 .sale-badge.rejected { background: #f8e5e1; color: #8b3227; }

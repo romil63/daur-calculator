@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#8a5b2b" />
     <title>Daur Calculator</title>
-    <link rel="stylesheet" href="styles.css?v=sales-approval-1" />
+    <link rel="stylesheet" href="styles.css?v=sale-descriptions-1" />
   </head>
   <body>
     <main class="calculator">
@@ -68,6 +68,17 @@
         <div class="row"><span id="gst-label">GST (3%)</span><strong id="gst-value">₹0.00</strong></div>
         <div class="row total"><span>Final Total</span><strong id="final-total">₹0.00</strong></div>
         <button type="button" id="add-estimate-button" class="add-estimate">Add to Estimate List</button>
+        <details class="staff-access">
+          <summary>Staff sign in</summary>
+          <form id="staff-login-form" class="staff-login-form">
+            <label>Staff email<input id="staff-email" type="email" autocomplete="username" required /></label>
+            <label>Password<input id="staff-password" type="password" autocomplete="current-password" required /></label>
+            <button type="submit">Sign in</button>
+          </form>
+          <div id="staff-session" hidden><span id="staff-session-label"></span> <button type="button" id="staff-signout-button" class="secondary">Sign out</button></div>
+          <p id="staff-auth-message" class="message" role="status"></p>
+        </details>
+        <label id="sale-description-field" hidden>Salesperson description<textarea id="sale-description" rows="2" maxlength="500" placeholder="Add a short note about this sale"></textarea></label>
         <button type="button" id="request-sale-button" class="secondary sale-request-button" hidden>Mark as sold</button>
         <p id="sale-request-note" class="fixed-note" hidden>Sale requests are counted only after admin approval.</p>
         <p id="sale-request-message" class="message" role="status"></p>
@@ -88,6 +99,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js"></script>
-    <script src="app.js?v=sales-approval-1"></script>
+    <script src="app.js?v=sale-descriptions-1"></script>
   </body>
 </html>
