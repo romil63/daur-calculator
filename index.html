@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#8a5b2b" />
     <title>Daur Calculator</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=sales-approval-1" />
   </head>
   <body>
     <main class="calculator">
@@ -68,6 +68,9 @@
         <div class="row"><span id="gst-label">GST (3%)</span><strong id="gst-value">₹0.00</strong></div>
         <div class="row total"><span>Final Total</span><strong id="final-total">₹0.00</strong></div>
         <button type="button" id="add-estimate-button" class="add-estimate">Add to Estimate List</button>
+        <button type="button" id="request-sale-button" class="secondary sale-request-button" hidden>Mark as sold</button>
+        <p id="sale-request-note" class="fixed-note" hidden>Sale requests are counted only after admin approval.</p>
+        <p id="sale-request-message" class="message" role="status"></p>
       </section>
       <p id="message" class="message" role="alert"></p>
     </main>
@@ -85,6 +88,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <script src="supabase-client.js"></script>
-    <script src="app.js"></script>
+    <script src="app.js?v=sales-approval-1"></script>
   </body>
 </html>

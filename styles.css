@@ -81,6 +81,19 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .admin-toolbar h2 { margin: 0; }
 .admin-toolbar button { padding: 0 18px; }
 .import-batches-list { display: grid; gap: 12px; margin-top: 12px; }
+.sales-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+.sales-metrics article { display: grid; gap: 4px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fffdf9; }
+.sales-metrics span, .sale-meta { color: var(--muted); font-size: .92rem; }
+.sales-metrics strong { color: var(--ink); font-size: 1.7rem; }
+.sales-list { display: grid; gap: 10px; margin-top: 12px; }
+.sale-card { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.sale-card h3 { margin: 0; }
+.sale-meta { margin: 5px 0 0; }
+.sale-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.sale-badge { display: inline-block; margin-top: 7px; padding: 3px 9px; border-radius: 999px; background: #f4eadb; color: #6d4b28; font-size: .8rem; font-weight: 700; }
+.sale-badge.approved { background: #e4f4df; color: #285a32; }
+.sale-badge.rejected { background: #f8e5e1; color: #8b3227; }
+.sale-request-button { width: 100%; margin-top: 10px; }
 .import-batch { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fffdf9; }
 .import-batch-heading { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .import-batch-heading h3 { margin: 0; font: 700 1rem/1.3 Arial, sans-serif; }
@@ -94,6 +107,8 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 @media (max-width: 500px) {
   .actions { grid-template-columns: 1fr; }
   .admin-rate-grid { grid-template-columns: 1fr; }
+  .sales-metrics { grid-template-columns: 1fr; }
+  .sale-card { align-items: flex-start; flex-direction: column; }
   .estimate-item { display: block; }
   .estimate-item-total { justify-items: start; text-align: left; margin-top: 12px; }
 }

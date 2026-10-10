@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#8a5b2b" />
   <title>Daur Admin</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=sales-approval-1" />
 </head>
 <body>
   <main class="calculator admin-page">
@@ -35,6 +35,15 @@
     </section>
     <div id="admin-dashboard" hidden>
       <div class="admin-toolbar"><h2>Admin controls</h2><button type="button" id="logout-button" class="secondary">Sign out</button></div>
+      <section class="card">
+        <div class="admin-toolbar"><h2>Sales approvals</h2><button type="button" id="refresh-sales-button" class="secondary">Refresh</button></div>
+        <div class="sales-metrics" aria-live="polite">
+          <article><span>Approved sold pieces</span><strong id="approved-sales-count">—</strong></article>
+          <article><span>Awaiting approval</span><strong id="pending-sales-count">—</strong></article>
+        </div>
+        <p id="sales-message" class="message" role="status"></p>
+        <div id="sales-list" class="sales-list"></div>
+      </section>
       <section class="card">
         <h2>Rate Card</h2>
         <p class="fixed-note">Saved rates are shared with the calculator panel. Workbook imports do not change these values.</p>
@@ -71,6 +80,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
-  <script src="admin.js?v=batch-history-7"></script>
+  <script src="admin.js?v=sales-approval-1"></script>
 </body>
 </html>

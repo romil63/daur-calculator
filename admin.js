@@ -123,6 +123,89 @@ async function loadBatches() {
   }
 }
 
+async function loadSales() {
+  const message = byId("sales-message");
+  const container = byId("sales-list");
+  message.textContent = "Loading sales…";
+  container.replaceChildren();
+  try {
+    await requireAdmin();
+    const [approved, pending, recent] = await Promise.all([
+      daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "approved"),
+      daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      daurDb.from("sales").select("id,model_number,status,created_at").order("created_at", { ascending: false }).limit(100),
+    ]);
+    for (const result of [approved, pending, recent]) if (result.error) throw result.error;
+
+    byId("approved-sales-count").textContent = String(approved.count ?? 0);
+    byId("pending-sales-count").textContent = String(pending.count ?? 0);
+    if (!recent.data.length) {
+      message.textContent = "No sale requests yet.";
+      return;
+    }
+
+    for (const sale of recent.data) {
+      const card = document.createElement("article");
+      card.className = "sale-card";
+      const info = document.createElement("div");
+      const title = document.createElement("h3");
+      title.textContent = `Model ${sale.model_number}`;
+      const badge = document.createElement("span");
+      badge.className = `sale-badge ${sale.status}`;
+      badge.textContent = sale.status === "approved" ? "Approved · Sold" : sale.status === "rejected" ? "Rejected" : "Awaiting approval";
+      const date = document.createElement("p");
+      date.className = "sale-meta";
+      date.textContent = new Date(sale.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+      info.append(title, badge, date);
+
+      if (sale.status === "pending") {
+        const actions = document.createElement("div");
+        actions.className = "sale-actions";
+        const approve = document.createElement("button");
+        approve.type = "button";
+        approve.textContent = "Approve sale";
+        approve.addEventListener("click", () => reviewSale(sale, "approve_sale"));
+        const reject = document.createElement("button");
+        reject.type = "button";
+        reject.className = "secondary";
+        reject.textContent = "Reject";
+        reject.addEventListener("click", () => reviewSale(sale, "reject_sale"));
+        actions.append(approve, reject);
+        card.append(info, actions);
+      } else {
+        card.append(info);
+      }
+      container.append(card);
+    }
+    message.textContent = recent.data.length === 100
+      ? "Showing the latest 100 sale records."
+      : `${recent.data.length} sale record${recent.data.length === 1 ? "" : "s"} shown.`;
+  } catch (error) {
+    message.textContent = error.code === "42P01" || error.code === "PGRST205"
+      ? "Sale approvals need setup. Run supabase/sales_approval.sql once in Supabase SQL Editor, then refresh."
+      : error.message;
+  }
+}
+
+async function reviewSale(sale, action) {
+  const approving = action === "approve_sale";
+  const prompt = approving
+    ? `Approve sale of model ${sale.model_number}? It will count as sold and stop future calculator lookups.`
+    : `Reject the sale request for model ${sale.model_number}? The product will remain available.`;
+  if (!window.confirm(prompt)) return;
+
+  const message = byId("sales-message");
+  message.textContent = "Updating sale request…";
+  try {
+    await requireAdmin();
+    const { error } = await daurDb.rpc(action, { p_sale_id: sale.id });
+    if (error) throw error;
+    await loadSales();
+  } catch (error) {
+    message.textContent = error.message;
+  }
+}
+
 async function checkSession() {
   if (!daurDb) {
     byId("login-message").textContent = "Supabase is not configured. Add your project URL and publishable key to supabase-config.js.";
@@ -135,6 +218,7 @@ async function checkSession() {
     showAdmin(true);
     await loadRateCard();
     await loadBatches();
+    await loadSales();
   } catch (error) { byId("login-message").textContent = error.message; }
 }
 
@@ -157,6 +241,7 @@ byId("admin-login-form").addEventListener("submit", async (event) => {
   try { await loadRateCard(); }
   catch (loadError) { byId("rates-message").textContent = loadError.message; }
   await loadBatches();
+  await loadSales();
 });
 
 byId("forgot-password-button").addEventListener("click", async () => {
@@ -243,6 +328,7 @@ byId("save-rates-button").addEventListener("click", async () => {
 });
 
 byId("refresh-batches-button").addEventListener("click", loadBatches);
+byId("refresh-sales-button").addEventListener("click", loadSales);
 
 function numeric(value, label) {
   const parsed = Number(String(value ?? "").replaceAll(",", "").trim() || 0);

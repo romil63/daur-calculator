@@ -3,6 +3,7 @@ const estimates = [];
 let currentCalculation = null;
 let currentProductModel = "";
 let currentProductLabor = 0;
+let currentProductSaleStatus = "unavailable";
 
 const input = (id) => document.getElementById(id);
 const money = new Intl.NumberFormat("en-IN", {
@@ -35,6 +36,21 @@ function showRates() {
   input("certificate-charge").textContent = money.format(rates.certificateCharge);
   input("making-label").textContent = `Making Charges (${(rates.makingRate * 100).toFixed(2).replace(/\.00$/, "")}% when no item labour is supplied)`;
   input("gst-label").textContent = `GST (${(rates.gstRate * 100).toFixed(2).replace(/\.00$/, "")}%)`;
+}
+
+function showSaleControl(status) {
+  const button = input("request-sale-button");
+  const message = input("sale-request-message");
+  currentProductSaleStatus = status;
+  button.hidden = status === "unavailable" || status === "sold";
+  input("sale-request-note").hidden = button.hidden;
+  button.disabled = status === "pending";
+  button.textContent = status === "pending" ? "Pending admin approval" : "Mark as sold";
+  message.textContent = status === "pending"
+    ? "This model is waiting for admin approval."
+    : status === "sold"
+      ? "This model has already been approved as sold."
+      : "";
 }
 
 async function loadRates() {
@@ -96,6 +112,7 @@ input("reset-button").addEventListener("click", () => {
   input("calculator-form").reset();
   currentProductModel = "";
   currentProductLabor = 0;
+  showSaleControl("unavailable");
   input("stone-weight").value = 0;
   input("gold-rate-24").value = rates.goldRate24;
   input("gold-rate-14").value = rates.goldRate14.toFixed(2);
@@ -166,16 +183,26 @@ async function lookupProduct() {
   if (!window.daurSupabase) { input("lookup-message").textContent = "Supabase is not configured. Set up the project connection first."; return; }
   const code = input("product-code").value.trim();
   if (!code) { input("lookup-message").textContent = "Scan the model ID or enter it manually."; return; }
+  currentProductModel = "";
+  currentProductLabor = 0;
+  showSaleControl("unavailable");
   try {
     const { data, error } = await window.daurSupabase.rpc("lookup_product", { p_code: code });
     if (error) throw error;
     const product = Array.isArray(data) ? data[0] : data;
     if (!product) throw new Error("No product matches that model ID.");
+    if (product.sale_status === "sold") {
+      currentCalculation = null;
+      input("lookup-message").textContent = `${product.model_number} is already marked as sold.`;
+      showSaleControl("sold");
+      return;
+    }
     input("net-weight").value = product.net_weight;
     input("diamond-weight").value = product.diamond_weight;
     input("stone-weight").value = product.stone_weight || 0;
     currentProductModel = product.model_number;
     currentProductLabor = Number(product.labor_charge || 0);
+    showSaleControl(product.sale_status === "pending" ? "pending" : "available");
     document.querySelector(`input[name="gold-purity"][value="${product.purity}"]`).checked = true;
     input("lookup-message").textContent = `${product.model_number}${product.description ? ` · ${product.description}` : ""} loaded.`;
     currentCalculation = calculate();
@@ -185,7 +212,29 @@ async function lookupProduct() {
 
 input("lookup-button").addEventListener("click", lookupProduct);
 input("product-code").addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); lookupProduct(); } });
-input("product-code").addEventListener("input", () => { currentProductModel = ""; currentProductLabor = 0; });
+input("product-code").addEventListener("input", () => {
+  currentProductModel = "";
+  currentProductLabor = 0;
+  showSaleControl("unavailable");
+});
+
+input("request-sale-button").addEventListener("click", async () => {
+  const button = input("request-sale-button");
+  const message = input("sale-request-message");
+  if (!currentProductModel || currentProductSaleStatus !== "available") return;
+  const modelNumber = currentProductModel;
+  button.disabled = true;
+  message.textContent = "Sending sale for admin approval…";
+  try {
+    const { error } = await window.daurSupabase.rpc("submit_sale", { p_model_number: modelNumber });
+    if (error) throw error;
+    showSaleControl("pending");
+    input("lookup-message").textContent = `${modelNumber} submitted to admin for sale approval.`;
+  } catch (error) {
+    button.disabled = false;
+    message.textContent = error.message;
+  }
+});
 
 let qrStream = null;
 input("scan-button").addEventListener("click", async () => {
