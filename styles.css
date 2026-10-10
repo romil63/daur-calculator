@@ -84,7 +84,7 @@ button.secondary { background: #ded3c5; color: var(--ink); }
 .admin-toolbar h2 { margin: 0; }
 .admin-toolbar button { padding: 0 18px; }
 .import-batches-list { display: grid; gap: 12px; margin-top: 12px; }
-.sales-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+.sales-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
 .sales-metrics article { display: grid; gap: 4px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #fffdf9; }
 .sales-metrics span, .sale-meta { color: var(--muted); font-size: .92rem; }
 .sales-metrics strong { color: var(--ink); font-size: 1.7rem; }

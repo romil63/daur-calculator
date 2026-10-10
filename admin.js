@@ -130,13 +130,15 @@ async function loadSales() {
   container.replaceChildren();
   try {
     await requireAdmin();
-    const [approved, pending, recent] = await Promise.all([
+    const [inventory, approved, pending, recent] = await Promise.all([
+      daurDb.from("products").select("model_number", { count: "exact", head: true }),
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "approved"),
       daurDb.from("sales").select("id", { count: "exact", head: true }).eq("status", "pending"),
       daurDb.from("sales").select("id,model_number,status,description,admin_description,created_at").order("created_at", { ascending: false }).limit(100),
     ]);
-    for (const result of [approved, pending, recent]) if (result.error) throw result.error;
+    for (const result of [inventory, approved, pending, recent]) if (result.error) throw result.error;
 
+    byId("available-pieces-count").textContent = String(Math.max((inventory.count ?? 0) - (approved.count ?? 0), 0));
     byId("approved-sales-count").textContent = String(approved.count ?? 0);
     byId("pending-sales-count").textContent = String(pending.count ?? 0);
     if (!recent.data.length) {

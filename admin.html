@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#8a5b2b" />
   <title>Daur Admin</title>
-  <link rel="stylesheet" href="styles.css?v=sale-descriptions-1" />
+  <link rel="stylesheet" href="styles.css?v=inventory-count-1" />
 </head>
 <body>
   <main class="calculator admin-page">
@@ -38,6 +38,7 @@
       <section class="card">
         <div class="admin-toolbar"><h2>Sales approvals</h2><button type="button" id="refresh-sales-button" class="secondary">Refresh</button></div>
         <div class="sales-metrics" aria-live="polite">
+          <article><span>Available inventory pieces</span><strong id="available-pieces-count">—</strong></article>
           <article><span>Approved sold pieces</span><strong id="approved-sales-count">—</strong></article>
           <article><span>Awaiting approval</span><strong id="pending-sales-count">—</strong></article>
         </div>
@@ -80,6 +81,6 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="supabase-config.js"></script>
   <script src="supabase-client.js"></script>
-  <script src="admin.js?v=sale-descriptions-1"></script>
+  <script src="admin.js?v=inventory-count-1"></script>
 </body>
 </html>
